@@ -1,0 +1,92 @@
+service: hal-api-example
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+plugins:
+  - serverless-dynamodb-fixtures
+
+custom:
+  fixtures:
+    - table: ${self:provider.environment.ORDER_TABLE}
+      enable: false
+      concurrentWrites: 5
+      sources:
+        - ./fixtures/generated/orders-${opt:stage, self:provider.stage}.json
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  memorySize: 128
+  environment:
+    ORDER_TABLE: ${self:service}-order-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ORDER_TABLE}"
+
+functions:
+  list:
+    handler: src/orders/list.list
+    events:
+      - http:
+          path: orders
+          method: get
+          cors: true
+  create:
+    handler: src/orders/create.create
+    events:
+      - http:
+          path: orders
+          method: post
+          cors: true
+  update:
+    handler: src/orders/update.update
+    events:
+      - http:
+          path: orders/{id}
+          method: put
+          cors: true
+  get:
+    handler: src/orders/get.get
+    events:
+      - http:
+          path: orders/{id}
+          method: get
+          cors: true
+  delete:
+    handler: src/orders/delete.delete
+    events:
+      - http:
+          path: orders/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    OrdersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Delete
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+#          -
+#            AttributeName: sortNumber
+#            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+#          -
+#            AttributeName: id
+#            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.ORDER_TABLE}

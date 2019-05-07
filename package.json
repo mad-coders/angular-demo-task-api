@@ -1,0 +1,28 @@
+{
+  "name": "hal-api-example",
+  "version": "1.0.0",
+  "description": "HAL REST API ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Piotr Lewandowski",
+    "email": "p.lewandowski@madcoders.pl",
+    "url": "http://madcoders.co"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.449.0",
+    "hal": "^1.2.0",
+    "path": "^0.12.7",
+    "util": "^0.12.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "fs": "0.0.1-security",
+    "mocker-data-generator": "^2.6.6",
+    "serverless": "^1.41.1",
+    "serverless-dynamodb-fixtures": "0.0.4"
+  }
+}

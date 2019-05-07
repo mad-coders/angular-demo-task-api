@@ -1,0 +1,25 @@
+options:
+  docker: true
+
+pipelines:
+  branches:
+    master:
+      - step:
+          name: build app artifacts
+          image: node:10.15.3
+          deployment: test
+          caches:
+            - npm
+          script:
+            # AWS setup
+            - export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-"eu-central-1"}
+            # build
+            - npm install
+            - npm run docker-build
+            - npm install -g serverless
+            # serverless deploy
+            - NODE_ENV=production serverless deploy -s staging
+
+definitions:
+  caches:
+    npm: ~/.npm
